@@ -1,11 +1,17 @@
 "use server"
 
+import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
-import { addNote } from "../services/notes"
-import { toggleImportance } from "../services/notes"
+import { addNote } from "@/app/services/notes"
+import { toggleImportance } from "@/app/services/notes"
 
 export const createNote = async (formData: FormData) => {
+  const session = await auth()
+  if (!session) {
+    redirect("/login")
+  }
+
   const content = formData.get("content") as string
   const important = formData.get("important") === "on"
   await addNote(content, important)
